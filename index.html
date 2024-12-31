@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Surprise</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            text-align: center;
+            color: #fff;
+        }
+        #landing-page, #surprise-page, #game-page {
+            display: none;
+        }
+        #password-page {
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: transform 0.3s;
+        }
+        button:hover {
+            transform: scale(1.1);
+        }
+        h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .theme-button {
+            background-color: #ff6f61;
+            border-radius: 20px;
+            padding: 10px 30px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .quote {
+            font-style: italic;
+            color: #f8f9fa;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Password Page -->
+    <div id="password-page">
+        <h1>Welcome to the Birthday Surprise!</h1>
+        <p>Enter the password to unlock the surprise:</p>
+        <input type="password" id="password" placeholder="Enter password">
+        <button id="submit-password">Submit</button>
+    </div>
+
+    <!-- Landing Page -->
+    <div id="landing-page">
+        <h1>Happy Birthday <span id="username"></span>!</h1>
+        <p id="personalized-message"></p>
+        <button onclick="showGamePage()">Click for a Surprise!</button>
+        <div id="surprise-content"></div>
+    </div>
+
+    <!-- Game Page (Puzzle) -->
+    <div id="game-page">
+        <h1>Let's Play a Game!</h1>
+        <p>Solve the puzzle by arranging the pieces correctly!</p>
+        <div id="puzzle-container">
+            <!-- Puzzle pieces will be dynamically created here -->
+        </div>
+        <button onclick="checkPuzzle()">Submit Answer</button>
+        <div id="puzzle-result"></div>
+        <button onclick="showLandingPage()">Go Back to Surprise</button>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="background-music" src="background-music.mp3" loop></audio>
+
+    <script>
+        // Function to check the password
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            const correctPassword = "Arpi1190"; // Set the correct password here
+
+            if (password === correctPassword) {
+                // Password is correct, show the landing page
+                document.getElementById('password-page').style.display = 'none';
+                document.getElementById('landing-page').style.display = 'block';
+                document.getElementById('background-music').play();  // Play the local song
+                startConfetti();
+            } else {
+                alert('Incorrect password!');
+            }
+        }
+
+        // Function to navigate to the game page
+        function showGamePage() {
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('game-page').style.display = 'block';
+            generatePuzzle();
+        }
+
+        // Function to generate puzzle pieces dynamically
+        function generatePuzzle() {
+            const puzzleContainer = document.getElementById('puzzle-container');
+            puzzleContainer.innerHTML = ''; // Clear any existing puzzle
+            const pieces = ['piece1', 'piece2', 'piece3', 'piece4', 'piece5', 'piece6', 'piece7', 'piece8', 'piece9'];
+            let shuffledPieces = shuffleArray(pieces);
+
+            shuffledPieces.forEach(piece => {
+                const pieceDiv = document.createElement('div');
+                pieceDiv.classList.add('puzzle-piece');
+                pieceDiv.id = piece;
+                pieceDiv.innerText = piece;
+                puzzleContainer.appendChild(pieceDiv);
+            });
+        }
+
+        // Function to shuffle the pieces randomly
+        function shuffleArray(arr) {
+            return arr.sort(() => Math.random() - 0.5);
+        }
+
+        // Function to check if the puzzle is solved correctly
+        function checkPuzzle() {
+            const pieces = ['piece1', 'piece2', 'piece3', 'piece4', 'piece5', 'piece6', 'piece7', 'piece8', 'piece9'];
+            const puzzleContainer = document.getElementById('puzzle-container');
+            let correct = true;
+
+            // Check if the puzzle pieces are in the correct order
+            for (let i = 0; i < pieces.length; i++) {
+                const piece = puzzleContainer.children[i];
+                if (piece.id !== 'piece' + (i + 1)) {
+                    correct = false;
+                    break;
+                }
+            }
+
+            const result = document.getElementById('puzzle-result');
+            if (correct) {
+                result.textContent = "Congratulations! You solved the puzzle!";
+            } else {
+                result.textContent = "Oops! Try again!";
+            }
+        }
+
+        // Function to start confetti animation
+        function startConfetti() {
+            const duration = 5 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+
+        // Function to show the landing page again
+        function showLandingPage() {
+            document.getElementById('game-page').style.display = 'none';
+            document.getElementById('landing-page').style.display = 'block';
+        }
+
+        // Personalized experience
+        function personalizeExperience() {
+            const username = prompt("Enter your name:");
+            document.getElementById('username').textContent = username;
+            document.getElementById('personalized-message').textContent = "What's your favorite birthday memory, " + username + "?";
+        }
+
+        // Ensure the DOM is fully loaded before adding event listener
+        document.addEventListener("DOMContentLoaded", function() {
+            // Attach event listener to the submit button
+            document.getElementById('submit-password').addEventListener('click', checkPassword);
+            personalizeExperience();
+        });
+    </script>
+</body>
+</html>
